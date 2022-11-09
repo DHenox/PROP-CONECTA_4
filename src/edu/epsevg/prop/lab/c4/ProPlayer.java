@@ -22,10 +22,11 @@ public class ProPlayer implements Jugador, IAuto {
     }
 
     /**
-     * Retornar columna on realitzar el nou moviment per al color indicat
-     * @param t
-     * @param color
-     * @return 
+     * Cerca la columna en la que realitzar el següent moviment
+     * a partir del tauler
+     * @param t el tauler actualment
+     * @param color el color del ProPlayer
+     * @return l'index de la columna
      */
     public int moviment(Tauler t, int color)
     {
@@ -46,9 +47,9 @@ public class ProPlayer implements Jugador, IAuto {
      * consecutives fila/columna/diagonal per a un determinat jugador, les
      * connexions consecutives entre fitxes del ProPlayer sumen 1 i les
      * connexions consecutives entre fitxes del contrincant resten 1
-     * @param t
-     * @param color
-     * @return 
+     * @param t el tauler a analitzar
+     * @param color color del ProPlayer
+     * @return valor heuristic del node actual
      */
     public int heuristica(Tauler t, int color){
         int value = 0;
@@ -130,10 +131,11 @@ public class ProPlayer implements Jugador, IAuto {
     }
     
     /**
-     * Creació de tots els fills a partir de l'estat t
-     * @param t
-     * @param color
-     * @return 
+     * Crea tots els fills a partir d'un tauler i els associa
+     * amb l'index de la columna modificada
+     * @param t tauler a expandir
+     * @param color color del jugador a expandir
+     * @return llista de parells taulerFill-indexColumnaModificada
      */
     public ArrayList<Pair<Tauler, Integer>> creaFills(Tauler t, int color){
         ArrayList<Pair<Tauler, Integer>> fills = new ArrayList<>();
@@ -162,12 +164,12 @@ public class ProPlayer implements Jugador, IAuto {
     }
     
     /**
-     * A partir de l'estat t fa ús de minimax fins a una determinada profunditat(depth),
-     * pren decisions tenint en compte l'heuristica dels nodes finals(depth=0)
-     * @param t
-     * @param depth
-     * @param maximizingPlayer
-     * @return 
+     * Calcula la heuristica dels nodes a una determinada profunditat, selecciona
+     * la columna que arribi a un millor resultat
+     * @param t tauler analitzat
+     * @param depth profunditat màxima
+     * @param maximizingPlayer jugador que maximitza(ProPlayer) o minimitza(Contrincant) l'heuristica
+     * @return parell heuristicaTauler-columnaSeleccionada
      */
     public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer){
         if(depth == 0 || thereIsWinner(t) || !t.espotmoure()){
@@ -207,10 +209,9 @@ public class ProPlayer implements Jugador, IAuto {
     }
     
     /**
-     * Funció boleana que retorna true en cas de que existeixi un guanyador
-     * altrament retorna fals
-     * @param t
-     * @return 
+     * Comprova si existeix un ganador donat un tauler
+     * @param t el tauler
+     * @return true si existeix un ganador, false altrament
      */
     private boolean thereIsWinner(Tauler t){
         int N = t.getMida();
