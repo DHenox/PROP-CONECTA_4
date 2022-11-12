@@ -49,7 +49,7 @@ public class ProPlayer implements Jugador, IAuto {
     {
         myColor = color;
         //  Obté la milor columna (tauler actual, profunditat, torn)
-        int col = minimax(t, profunditat, true, 0).snd;
+        int col = minimax(t, profunditat, true, 0, Integer.MIN_VALUE, Integer.MAX_VALUE).snd;
         return col;
     }
     
@@ -95,7 +95,7 @@ public class ProPlayer implements Jugador, IAuto {
      * @param maximizingPlayer jugador que maximitza(ProPlayer) o minimitza(Contrincant) l'heuristica
      * @return parell heuristicaTauler-columnaSeleccionada
      */
-    public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer, int ultCol){
+    public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer, int ultCol, int alpha, int beta){
         if(t.solucio(ultCol, myColor))
             return new Pair<>(10000, ultCol);
         else if(t.solucio(ultCol, myColor*-1))
@@ -114,11 +114,14 @@ public class ProPlayer implements Jugador, IAuto {
                     Tauler f = new Tauler(t);
                     //  Afegim una fitxa a una columna del nou tauler
                     f.afegeix(i, myColor);
-                    int eval = minimax(f, depth-1, !maximizingPlayer, i).fst;
+                    int eval = minimax(f, depth-1, !maximizingPlayer, i, alpha, beta).fst;
+                    alpha = Math.max(maxEval, alpha);
                     if(maxEval < eval){
                         maxEval = eval;
                         col = i;
                     }
+                    if(alpha >= beta)
+                        break;
                 }
             }
             return new Pair<>(maxEval, col);
@@ -132,11 +135,14 @@ public class ProPlayer implements Jugador, IAuto {
                     Tauler f = new Tauler(t);
                     //  Afegim una fitxa a una columna del nou tauler
                     f.afegeix(i, myColor*-1);
-                    int eval = minimax(f, depth-1, !maximizingPlayer, i).fst;
+                    int eval = minimax(f, depth-1, !maximizingPlayer, i, alpha, beta).fst;
+                    beta = Math.min(minEval, beta);
                     if(minEval > eval){
                         minEval = eval;
                         col = i;
                     }
+                    if(alpha >= beta)
+                        break;
                 }
             }
             return new Pair<>(minEval, col);
