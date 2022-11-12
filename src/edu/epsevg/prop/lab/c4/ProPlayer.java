@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 /**
  * Pro player
- * @author HENOK
+ * @author Henok Argudo i Cinta Gonzalez
  */
 public class ProPlayer implements Jugador, IAuto {
     private String nom;
@@ -31,16 +31,20 @@ public class ProPlayer implements Jugador, IAuto {
         {3, 4, 5, 7, 7, 5, 4, 3}
     };
     
-    public ProPlayer(int prof)
+    /**
+     * Constructor de ProPlayer parametritzat amb la profunditat maxima
+     * @param depth profunditat maxima
+     */
+    public ProPlayer(int depth)
     {
         nom = "ProPlayer";
-        profunditat = prof;
+        profunditat = depth;
         myColor = 0;
     }
 
     /**
      * Cerca la columna en la que realitzar el següent moviment
-     * a partir del tauler
+     * a partir de la situacio actual del tauler
      * @param t el tauler actualment
      * @param color el color del ProPlayer
      * @return l'index de la columna
@@ -48,13 +52,14 @@ public class ProPlayer implements Jugador, IAuto {
     public int moviment(Tauler t, int color)
     {
         myColor = color;
-        //  Obté la milor columna (tauler actual, profunditat, torn)
+        //  Tots els parametres d'aquesta funció estan explicats a la docu
         int col = minimax(t, profunditat, true, 0, Integer.MIN_VALUE, Integer.MAX_VALUE).snd;
         return col;
     }
     
     /**
-     * TODO
+     * Calcula l'heuristica a partir de sumar/restar les prediccions
+     * de cada casella del tauler en funció del color que ocupa la casella
      * @param t el tauler a analitzar
      * @return valor heuristic del node actual
      */
@@ -81,7 +86,7 @@ public class ProPlayer implements Jugador, IAuto {
      * @return true si la fila i-éssima es buida, false altrament
      */
     public boolean isEmpty(Tauler t, int i){
-        return (t.getColor(i, 0)==0 && t.getColor(i,1)==0  &&
+        return (t.getColor(i, 0)==0 && t.getColor(i,1)==0 &&
                 t.getColor(i, 2)==0 && t.getColor(i,3)==0 &&
                 t.getColor(i, 4)==0 && t.getColor(i,5)==0 &&
                 t.getColor(i, 6)==0 && t.getColor(i,7)==0);
@@ -93,14 +98,18 @@ public class ProPlayer implements Jugador, IAuto {
      * @param t tauler analitzat
      * @param depth profunditat màxima
      * @param maximizingPlayer jugador que maximitza(ProPlayer) o minimitza(Contrincant) l'heuristica
-     * @return parell heuristicaTauler-columnaSeleccionada
+     * @param ultCol l'index de la ultima columna a la qual s'ha fet el darrer moviment
+     * @param alpha valor maxim que s'aplica per realitzar la poda alpha-beta
+     * @param beta valor minim que s'aplica per realitzar la poda alpha-beta
+     * @return parell [heuristica del tauler] - [columna seleccionada per fer seguent moviment]
      */
     public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer, int ultCol, int alpha, int beta){
-        if(t.solucio(ultCol, myColor))
+        
+        if(t.solucio(ultCol, myColor))              //  Guanyem nosaltres
             return new Pair<>(10000, ultCol);
-        else if(t.solucio(ultCol, myColor*-1))
+        else if(t.solucio(ultCol, myColor*-1))      //  Guanya el contrincant
             return new Pair<>(-10000, ultCol);
-        else if(depth == 0 || !t.espotmoure()){
+        else if(depth == 0 || !t.espotmoure()){     //  Empat o profunditat maxima
             return new Pair<>(heuristica(t), 0);
         }
         
@@ -151,7 +160,7 @@ public class ProPlayer implements Jugador, IAuto {
     
     /**
      * retorna el nom que identifica al ProPlayer
-     * @return 
+     * @return el nom del ProPlayer
      */
     public String nom()
     {
