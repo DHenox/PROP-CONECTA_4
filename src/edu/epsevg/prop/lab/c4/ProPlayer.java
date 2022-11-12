@@ -13,11 +13,28 @@ import java.util.ArrayList;
  */
 public class ProPlayer implements Jugador, IAuto {
     private String nom;
+    private int profunditat;
     private int myColor;
     
-    public ProPlayer()
+    /*  
+        Taula que associa a cada posició del tauler
+        el nº de possibles 4 en ratlla donat un color
+    */
+    public int[][] tablaPuntuacio = {
+        {3, 4, 5, 7, 7, 5, 4, 3},
+        {4, 6, 8,10,10, 8, 6, 4},
+        {5, 8,11,13,13,11, 8, 5},
+        {7,10,13,16,16,13,10, 7},
+        {7,10,13,16,16,13,10, 7},
+        {5, 8,11,13,13,11, 8, 5},
+        {4, 6, 8,10,10, 8, 6, 4},
+        {3, 4, 5, 7, 7, 5, 4, 3}
+    };
+    
+    public ProPlayer(int prof)
     {
-        nom = "Prop";
+        nom = "ProPlayer";
+        profunditat = prof;
         myColor = 0;
     }
 
@@ -31,7 +48,8 @@ public class ProPlayer implements Jugador, IAuto {
     public int moviment(Tauler t, int color)
     {
         myColor = color;
-        int col = minimax(t, 6, true).snd;      //  Obté la milor columna (tauler actual, profunditat, torn)
+        //  Obté la milor columna (tauler actual, profunditat, torn)
+        int col = minimax(t, profunditat, true, 0).snd;
         return col;
     }
     
@@ -51,12 +69,27 @@ public class ProPlayer implements Jugador, IAuto {
      * @param color color del ProPlayer
      * @return valor heuristic del node actual
      */
-    public int heuristica(Tauler t, int color){
+    public int heuristica(Tauler t){
         int value = 0;
+        int N = t.getMida();
+        for (int i = 0; i < 8; i++) {
+            if(isEmpty(t, i))
+                break;
+            for (int j = 0; j < 8; j++) {
+                if (t.getColor(i, j) == myColor) {
+                    value += tablaPuntuacio[i][j];
+                } else if (t.getColor(i, j) == myColor*-1) {
+                    value -= tablaPuntuacio[i][j];
+                }
+            }
+        }
+        return value;
+        /*int value = 0;
         int otherColor = color*-1;
         int N = t.getMida();
         
         for (int i = 0; i < N; i++) {
+            //  heuristica en files
             if(t.solucio(i, color)){
                 //System.out.println("I WIN HERE");
                 //t.pintaTaulerALaConsola();
@@ -69,28 +102,24 @@ public class ProPlayer implements Jugador, IAuto {
                 value -= 1000;
                 return value;
             }
-        }
-        
-        //  heuristica en files
-        for (int i = 0; i < N; i++) {
-            int myCntRow = 0, myMaxCnt = 0;
-            int otherCntRow = 0, otherMaxCnt = 0;
+            int myRowCnt = 0, myMaxCnt = 0;
+            int otherRowCnt = 0, otherMaxCnt = 0;
             for (int j = 0; j < N; j++) {
                 int currentColor = t.getColor(i, j);
                 if(currentColor == 0){
-                    myCntRow = 0;
-                    otherCntRow = 0;
+                    myRowCnt = 0;
+                    otherRowCnt = 0;
                 }
                 else if (j != 0 && currentColor == t.getColor(i, j-1)){
                     if(currentColor == color)
-                        ++myCntRow;
+                        ++myRowCnt;
                     else if(currentColor == otherColor)
-                        ++otherCntRow;
+                        ++otherRowCnt;
                     
-                    if(myCntRow > myMaxCnt)
-                        myMaxCnt = myCntRow;
-                    if(otherCntRow > otherMaxCnt)
-                        otherMaxCnt = otherCntRow;
+                    if(myRowCnt > myMaxCnt)
+                        myMaxCnt = myRowCnt;
+                    if(otherRowCnt > otherMaxCnt)
+                        otherMaxCnt = otherRowCnt;
                 }
             }
             //System.out.println("Fila " + i + " MyRowHeuristica: " + myMaxCnt + " EnemyRowHeuristica: " + -otherMaxCnt);
@@ -98,69 +127,50 @@ public class ProPlayer implements Jugador, IAuto {
         }
         
         //  heuristica en columnes
-        for (int j = 0; j < N; j++) {                   
-            int myCntRow = 0, myMaxCnt = 0;
-            int otherCntRow = 0, otherMaxCnt = 0;
+        for (int j = 0; j < N; j++) {
+            int myColumnCnt = 0, myMaxCnt = 0;
+            int otherColumnCnt = 0, otherMaxCnt = 0;
             for (int i = 0; i < N; i++) {
                 int currentColor = t.getColor(i, j);
                 if (currentColor != 0 && i != 0 && currentColor == t.getColor(i-1, j)){
                     if(currentColor == color)
-                        ++myCntRow;
+                        ++myColumnCnt;
                     else if(currentColor == otherColor)
-                        ++otherCntRow;
+                        ++otherColumnCnt;
                     
-                    if(myCntRow > myMaxCnt)
-                        myMaxCnt = myCntRow;
-                    if(otherCntRow > otherMaxCnt)
-                        otherMaxCnt = otherCntRow;
+                    if(myColumnCnt > myMaxCnt)
+                        myMaxCnt = myColumnCnt;
+                    if(otherColumnCnt > otherMaxCnt)
+                        otherMaxCnt = otherColumnCnt;
                 }
                 else{
-                    myCntRow = 0;
-                    otherCntRow = 0;
+                    myColumnCnt = 0;
+                    otherColumnCnt = 0;
                 }
             }
             //System.out.println("Columna " + j + " MyColumnHeuristica: " + myMaxCnt + " EnemyColumnHeuristica: " + -otherMaxCnt);
             value += myMaxCnt - otherMaxCnt;
         }
         
+        //  TODO revisar si files i columnes OK     //  si que va xd, for invertido(i,j) en columnas
         //  TODO heuristica en diagonales positivas
         //  TODO heuristica en diagonales negativas
 
         //System.out.println("HEURISTICA: " + value);
-        return value;
+        return value;*/
     }
     
     /**
-     * Crea tots els fills a partir d'un tauler i els associa
-     * amb l'index de la columna modificada
-     * @param t tauler a expandir
-     * @param color color del jugador a expandir
-     * @return llista de parells taulerFill-indexColumnaModificada
+     * Funció que comprova si la fila indicada està totalment buida
+     * @param t el tauler a analitzar
+     * @param i la fila del tauler
+     * @return true si la fila i-éssima es buida, false altrament
      */
-    public ArrayList<Pair<Tauler, Integer>> creaFills(Tauler t, int color){
-        ArrayList<Pair<Tauler, Integer>> fills = new ArrayList<>();
-        int N = t.getMida();
-        //  Per cada columna de l'estat actual
-        for (int i = 0; i < N; i++) {
-            //  Si es poden afegir fitxes a la columna
-            if(t.movpossible(i)){
-                //  Copiem tot l'estat actual en un nou tauler
-                Tauler f = new Tauler(8);
-                for (int j = 0; j < N; j++) {
-                    for (int k = 0; k < N; k++) {
-                        int copyColor = t.getColor(j, k);
-                        if(copyColor != 0){
-                            f.afegeix(k, copyColor);
-                        }
-                    }
-                }
-                //  Afegim una fitxa a una columna del nou tauler
-                f.afegeix(i, color);
-                //  Emmagatzemem el nou fill i la columna modificada
-                fills.add(new Pair<>(f, i));
-            }
-        }
-        return fills;
+    public boolean isEmpty(Tauler t, int i){
+        return (t.getColor(i, 0)==0 && t.getColor(i,1)==0  &&
+                t.getColor(i, 2)==0 && t.getColor(i,3)==0 &&
+                t.getColor(i, 4)==0 && t.getColor(i,5)==0 &&
+                t.getColor(i, 6)==0 && t.getColor(i,7)==0);
     }
     
     /**
@@ -171,55 +181,56 @@ public class ProPlayer implements Jugador, IAuto {
      * @param maximizingPlayer jugador que maximitza(ProPlayer) o minimitza(Contrincant) l'heuristica
      * @return parell heuristicaTauler-columnaSeleccionada
      */
-    public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer){
-        if(depth == 0 || thereIsWinner(t) || !t.espotmoure()){
-            return new Pair<>(heuristica(t, myColor), 0);
+    public Pair<Integer, Integer> minimax(Tauler t, int depth, boolean maximizingPlayer, int ultCol){
+        if(t.solucio(ultCol, myColor))
+            return new Pair<>(10000, ultCol);
+        else if(t.solucio(ultCol, myColor*-1))
+            return new Pair<>(-10000, ultCol);
+        else if(depth == 0 || !t.espotmoure()){
+            return new Pair<>(heuristica(t), 0);
         }
         
         int col = 0;
         if(maximizingPlayer){
             //  Crea totes les possibles tirades del jugador que maximitza
-            ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor);
+            //ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor);
             int maxEval = Integer.MIN_VALUE;
-            for (int i = 0; i < fills.size(); i++) {
-                int eval = minimax(fills.get(i).fst, depth-1, !maximizingPlayer).fst;
-                if(maxEval < eval){
-                    maxEval = eval;
-                    col = fills.get(i).snd;        //  mal
+            for (int i = 0; i < 8; i++) {
+                //  Si es poden afegir fitxes a la columna
+                if(t.movpossible(i)){
+                    //  Copiem tot l'estat actual en un nou tauler
+                    Tauler f = new Tauler(t);
+                    //  Afegim una fitxa a una columna del nou tauler
+                    f.afegeix(i, myColor);
+                    int eval = minimax(f, depth-1, !maximizingPlayer, i).fst;
+                    if(maxEval < eval){
+                        maxEval = eval;
+                        col = i;
+                    }
                 }
             }
             return new Pair<>(maxEval, col);
         }
         else{
             //  Crea totes les possibles tirades del jugador que minimitza
-            ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor*-1);
+            //ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor*-1);
             int minEval = Integer.MAX_VALUE;
-            System.out.println("\n");
-            for (int i = 0; i < fills.size(); i++) {
-                int eval = minimax(fills.get(i).fst, depth-1, !maximizingPlayer).fst;
-                if(minEval > eval){
-                    minEval = eval;
-                    col = fills.get(i).snd;        //  mal
+            for (int i = 0; i < 8; i++) {
+                //  Si es poden afegir fitxes a la columna
+                if(t.movpossible(i)){
+                    //  Copiem tot l'estat actual en un nou tauler
+                    Tauler f = new Tauler(t);
+                    //  Afegim una fitxa a una columna del nou tauler
+                    f.afegeix(i, myColor*-1);
+                    int eval = minimax(f, depth-1, !maximizingPlayer, i).fst;
+                    if(minEval > eval){
+                        minEval = eval;
+                        col = i;
+                    }
                 }
-                //System.out.println("FILL " + i + " " + minEval +  " chosen column = " + col);
-                //fills.get(i).fst.pintaTaulerALaConsola();
             }
             return new Pair<>(minEval, col);
         }
-    }
-    
-    /**
-     * Comprova si existeix un ganador donat un tauler
-     * @param t el tauler
-     * @return true si existeix un ganador, false altrament
-     */
-    private boolean thereIsWinner(Tauler t){
-        int N = t.getMida();
-        for (int i = 0; i < N; i++) {
-            if(t.solucio(i, myColor) || t.solucio(i, myColor*-1))
-                return true;
-        }
-        return false;
     }
     
     /**
