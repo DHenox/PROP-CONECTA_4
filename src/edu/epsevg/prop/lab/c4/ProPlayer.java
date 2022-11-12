@@ -20,7 +20,7 @@ public class ProPlayer implements Jugador, IAuto {
         Taula que associa a cada posició del tauler
         el nº de possibles 4 en ratlla donat un color
     */
-    public int[][] tablaPuntuacio = {
+    public int[][] predictTable = {
         {3, 4, 5, 7, 7, 5, 4, 3},
         {4, 6, 8,10,10, 8, 6, 4},
         {5, 8,11,13,13,11, 8, 5},
@@ -65,9 +65,9 @@ public class ProPlayer implements Jugador, IAuto {
                 break;
             for (int j = 0; j < 8; j++) {
                 if (t.getColor(i, j) == myColor) {
-                    value += tablaPuntuacio[i][j];
+                    value += predictTable[i][j];
                 } else if (t.getColor(i, j) == myColor*-1) {
-                    value -= tablaPuntuacio[i][j];
+                    value -= predictTable[i][j];
                 }
             }
         }
