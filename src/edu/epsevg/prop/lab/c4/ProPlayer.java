@@ -53,25 +53,13 @@ public class ProPlayer implements Jugador, IAuto {
         return col;
     }
     
-    /*
-    La función heurística es proporcional a la potencia del número de fichas
-    que son continuas en una fila/columna/diagonal. Esto se suma para cada
-    fila, columna y diagonal. Nota: El valor calculado para cada fila/columna/diagonal
-    tiene un signo positivo o negativo dependiendo de qué fichas de colores estén
-    presentes consecutivamente en esa fila o columna.
-    */
     /**
-     * La funció heuristica es proporcional a la suma del nombre de fitxes
-     * consecutives fila/columna/diagonal per a un determinat jugador, les
-     * connexions consecutives entre fitxes del ProPlayer sumen 1 i les
-     * connexions consecutives entre fitxes del contrincant resten 1
+     * TODO
      * @param t el tauler a analitzar
-     * @param color color del ProPlayer
      * @return valor heuristic del node actual
      */
     public int heuristica(Tauler t){
         int value = 0;
-        int N = t.getMida();
         for (int i = 0; i < 8; i++) {
             if(isEmpty(t, i))
                 break;
@@ -84,80 +72,6 @@ public class ProPlayer implements Jugador, IAuto {
             }
         }
         return value;
-        /*int value = 0;
-        int otherColor = color*-1;
-        int N = t.getMida();
-        
-        for (int i = 0; i < N; i++) {
-            //  heuristica en files
-            if(t.solucio(i, color)){
-                //System.out.println("I WIN HERE");
-                //t.pintaTaulerALaConsola();
-                value += 1000;
-                return value;
-            }
-            if(t.solucio(i, otherColor)){
-                //System.out.println("YOU WIN HERE");
-                //t.pintaTaulerALaConsola();
-                value -= 1000;
-                return value;
-            }
-            int myRowCnt = 0, myMaxCnt = 0;
-            int otherRowCnt = 0, otherMaxCnt = 0;
-            for (int j = 0; j < N; j++) {
-                int currentColor = t.getColor(i, j);
-                if(currentColor == 0){
-                    myRowCnt = 0;
-                    otherRowCnt = 0;
-                }
-                else if (j != 0 && currentColor == t.getColor(i, j-1)){
-                    if(currentColor == color)
-                        ++myRowCnt;
-                    else if(currentColor == otherColor)
-                        ++otherRowCnt;
-                    
-                    if(myRowCnt > myMaxCnt)
-                        myMaxCnt = myRowCnt;
-                    if(otherRowCnt > otherMaxCnt)
-                        otherMaxCnt = otherRowCnt;
-                }
-            }
-            //System.out.println("Fila " + i + " MyRowHeuristica: " + myMaxCnt + " EnemyRowHeuristica: " + -otherMaxCnt);
-            value += myMaxCnt - otherMaxCnt;
-        }
-        
-        //  heuristica en columnes
-        for (int j = 0; j < N; j++) {
-            int myColumnCnt = 0, myMaxCnt = 0;
-            int otherColumnCnt = 0, otherMaxCnt = 0;
-            for (int i = 0; i < N; i++) {
-                int currentColor = t.getColor(i, j);
-                if (currentColor != 0 && i != 0 && currentColor == t.getColor(i-1, j)){
-                    if(currentColor == color)
-                        ++myColumnCnt;
-                    else if(currentColor == otherColor)
-                        ++otherColumnCnt;
-                    
-                    if(myColumnCnt > myMaxCnt)
-                        myMaxCnt = myColumnCnt;
-                    if(otherColumnCnt > otherMaxCnt)
-                        otherMaxCnt = otherColumnCnt;
-                }
-                else{
-                    myColumnCnt = 0;
-                    otherColumnCnt = 0;
-                }
-            }
-            //System.out.println("Columna " + j + " MyColumnHeuristica: " + myMaxCnt + " EnemyColumnHeuristica: " + -otherMaxCnt);
-            value += myMaxCnt - otherMaxCnt;
-        }
-        
-        //  TODO revisar si files i columnes OK     //  si que va xd, for invertido(i,j) en columnas
-        //  TODO heuristica en diagonales positivas
-        //  TODO heuristica en diagonales negativas
-
-        //System.out.println("HEURISTICA: " + value);
-        return value;*/
     }
     
     /**
@@ -192,8 +106,6 @@ public class ProPlayer implements Jugador, IAuto {
         
         int col = 0;
         if(maximizingPlayer){
-            //  Crea totes les possibles tirades del jugador que maximitza
-            //ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor);
             int maxEval = Integer.MIN_VALUE;
             for (int i = 0; i < 8; i++) {
                 //  Si es poden afegir fitxes a la columna
@@ -212,8 +124,6 @@ public class ProPlayer implements Jugador, IAuto {
             return new Pair<>(maxEval, col);
         }
         else{
-            //  Crea totes les possibles tirades del jugador que minimitza
-            //ArrayList<Pair<Tauler, Integer>> fills = creaFills(t, myColor*-1);
             int minEval = Integer.MAX_VALUE;
             for (int i = 0; i < 8; i++) {
                 //  Si es poden afegir fitxes a la columna
