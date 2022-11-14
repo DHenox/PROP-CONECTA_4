@@ -15,6 +15,7 @@ public class ProPlayer implements Jugador, IAuto {
     private String nom;
     private int profunditat;
     private int myColor;
+    private int cntNodes;
     
     /*  
         Taula que associa a cada posició del tauler
@@ -40,6 +41,7 @@ public class ProPlayer implements Jugador, IAuto {
         nom = "ProPlayer";
         profunditat = depth;
         myColor = 0;
+        cntNodes = 0;
     }
 
     /**
@@ -54,6 +56,7 @@ public class ProPlayer implements Jugador, IAuto {
         myColor = color;
         //  Tots els parametres d'aquesta funció estan explicats a la docu
         int col = minimax(t, profunditat, true, 0, Integer.MIN_VALUE, Integer.MAX_VALUE).snd;
+        System.out.println("Nombre de jugades finals explorades: " + cntNodes);
         return col;
     }
     
@@ -64,6 +67,7 @@ public class ProPlayer implements Jugador, IAuto {
      * @return valor heuristic del node actual
      */
     public int heuristica(Tauler t){
+        ++cntNodes;
         int value = 0;
         for (int i = 0; i < 8; i++) {
             if(isEmpty(t, i))
