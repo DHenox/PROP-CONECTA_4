@@ -70,7 +70,7 @@ public class ProPlayer implements Jugador, IAuto {
         ++cntNodes;
         int value = 0;
         for (int i = 0; i < 8; i++) {
-            if(isEmpty(t, i))
+            if(isRowEmpty(t, i))
                 break;
             for (int j = 0; j < 8; j++) {
                 if (t.getColor(i, j) == myColor) {
@@ -89,7 +89,7 @@ public class ProPlayer implements Jugador, IAuto {
      * @param i la fila del tauler
      * @return true si la fila i-éssima es buida, false altrament
      */
-    public boolean isEmpty(Tauler t, int i){
+    public boolean isRowEmpty(Tauler t, int i){
         return (t.getColor(i, 0)==0 && t.getColor(i,1)==0 &&
                 t.getColor(i, 2)==0 && t.getColor(i,3)==0 &&
                 t.getColor(i, 4)==0 && t.getColor(i,5)==0 &&
